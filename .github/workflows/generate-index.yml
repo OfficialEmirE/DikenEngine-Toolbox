@@ -1,0 +1,62 @@
+name: Generate Toolbox Index
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "assets/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate index.json
+        run: |
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+
+          assets = []
+
+          for index_file in sorted(Path("assets").glob("*/index.json")):
+              asset_dir = index_file.parent
+
+              with index_file.open("r", encoding="utf-8") as f:
+                  asset = json.load(f)
+
+              asset["file"] = f"{asset_dir.name}/{asset['file']}"
+              asset["thumbnail"] = f"{asset_dir.name}/{asset['thumbnail']}"
+
+              if "place-location" not in asset:
+                  asset["place-location"] = None
+
+              assets.append(asset)
+
+          with open("index.json", "w", encoding="utf-8") as f:
+              json.dump(assets, f, ensure_ascii=False, indent=2)
+              f.write("\n")
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add index.json
+
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git commit -m "Update toolbox index"
+          git push
