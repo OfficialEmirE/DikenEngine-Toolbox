@@ -1,6 +1,7 @@
 {
   "id": "tree",
   "name": "Tree",
+  "type": "model",
   "author": "Ramazanenescik04",
   "file": "tree.dnf",
   "thumbnail": "thumbnail.png",
