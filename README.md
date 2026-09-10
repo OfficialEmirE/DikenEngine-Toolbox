@@ -1,2 +1,2 @@
 # DikenEngine-Toolbox
-A repository for storing models in the Thorn Engine Toolbox.
+A repository for storing models in the DikenEngine Toolbox.
